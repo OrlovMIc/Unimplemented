@@ -1,0 +1,69 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{graphicx}
+\graphicspath{{./images/} }
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{hyperref}
+\usetheme{Warsaw}
+
+
+\title{TetCTF 2021 - Unimplemented}
+\author{Орлов Михаил, Уткин Артем}
+\date{June 2023}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+\begin{frame}
+\frametitle{В чем состоит наша задача?}
+Автор задания использовал особый вид шифрования, основанный на криптосистеме RSA, где вместо простых чисел используются гауссовы целые числа, а модуль N рассчитывается как $P^2Q^2$  вместо PQ. Наша задача состоит в том, чтобы воспроизвести процесс дешифрования сообщения, зашифрованного именно таким способом, имея закрытый ключ и, собственно, само сообщение.
+\end{frame}
+
+\begin{frame}
+\frametitle{Как мы решим задачу?}
+Как и в RSA, расшифровка при данном методе шифрования производится следующим образом:
+\begin{itemize}
+  \item $\phi(N)$
+  \item d=$\frac{1}{e}$ mod $\phi(N)$
+  \item m=$c^e$ mod N
+\end{itemize}
+Формулу для $\phi(x)$ \newline$\phi(x)={p_1}^{{r_1}-1}(p_1-1){p_2}^{{r_2}-1}(p_2-1)$...${p_k}^{{r_k}-1}$
+\newlineможно переписать в виде \newline$\phi(x)=x(1-\frac{1}{p_1})(1-\frac{1}{p_2})...(1-\frac{1}{p_k})$
+\newline и тогда \newline$\phi(N)=\phi(P^2Q^2)=\phi(P^2)\phi(Q^2)=P^2(1-\frac{1}{P})Q^2(1-\frac{1}{Q})$
+\newlineи... это не правильно
+\end{frame}
+
+
+
+
+\begin{frame}
+Мы имеем дело не с простыми целыми числами, а с гауссовыми целыми числами(с мнимой частью, равной 0).
+\newline Используем функцию \eta(\alpha)=$a^2+b^2$, где a и b - целая и мнимая части числа $\alpha$ соответственно. Получаем \newline
+$\phi(x^k)=\eta(x)^k(1-\frac{1}{\eta(x)})$ \newline
+$\phi(P^2)=\eta(P)^2(1-\frac{1}{\eta(P)})$ \newline
+$\phi(Q^2)=\eta(Q)^2(1-\frac{1}{\eta(Q)})$ \newline
+$\phi(N)=\phi(P^2)\phi(Q^2)=\eta(P)^2(1-\frac{1}{\eta(P)})\eta(Q)^2(1-\frac{1}{\eta(Q)})$ \newline
+Находим \newline
+$\phi(N)=(P^4-P^2)(Q^4-Q^2)$
+\end{frame}
+
+
+\begin{frame}
+\frametitle{А теперь напишем функцию?}
+Теперь, используя формулу, мы можем написать функцию дешифровки на Python
+\includegraphics[scale=0.7]{function}
+\end{frame}
+
+\begin{frame}
+\frametitle{Результат работы}
+Программа расшифровала текст и в нем оказался флаг. результат после ввода - положительный.
+\includegraphics[scale=0.35]{result}
+
+\end{frame}
+
+\begin{frame}
+\href{https://github.com/OrlovMIc/Unimplemented}{https://github.com/OrlovMIc/Unimplemented}
+\end{frame}
+\end{document}
